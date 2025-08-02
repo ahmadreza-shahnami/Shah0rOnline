@@ -28,8 +28,8 @@ class Membership(models.Model):
         unique_together = ('user', 'school')
 
     def clean(self):
-        if self.role.app != "school":
-            raise ValidationError("School Members roles must have app='school' ")
+        if self.role.scope.name != "school":
+            raise ValidationError("School Members roles must have school scoped roles")
         return super().clean()
 
     def __str__(self):

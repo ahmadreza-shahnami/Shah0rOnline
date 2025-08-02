@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 from django.db import models
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
-from role.models import Role
+from role.models import Role, Scope
 from location.models import City
 import string
 import random
@@ -16,9 +16,11 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password, **extra_fields):
+        scope, created = Scope.objects.get_or_create(name="global")
         role, created = Role.objects.get_or_create(name="superuser",
                                                    defaults={
                                                     "description":"Is Global App Admin.",
+                                                    "scope":scope,
                                                     "level":10
                                                     })
         extra_fields.setdefault('role', role)
