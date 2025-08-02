@@ -16,6 +16,12 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password, **extra_fields):
+        role, created = Role.objects.get_or_create(name="superuser",
+                                                   defaults={
+                                                    "description":"Is Global App Admin.",
+                                                    "level":10
+                                                    })
+        extra_fields.setdefault('role', role)
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
@@ -78,10 +84,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         self.generate_referral_code()
         super().save(*args, **kwargs)
 
-    def deactive(self):
+    def deactivate(self):
         self.is_active = False
         self.save() 
 
-    def active(self):
+    def activate(self):
         self.is_active = True
         self.save()     
