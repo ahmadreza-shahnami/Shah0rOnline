@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.utils.text import slugify
 from location.models import City
 from role.models import Role
 
@@ -8,12 +9,16 @@ CustomUser = get_user_model()
 
 class School(models.Model):
     name = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True,) 
+    slug = models.SlugField(unique=True, blank=True) 
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
     approved = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
     
 
 
