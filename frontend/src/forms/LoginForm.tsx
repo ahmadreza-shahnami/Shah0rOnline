@@ -20,8 +20,8 @@ const LoginForm = () => {
         try {
           await login(values);
           navigate("/");
-        } catch (err) {
-          setErrors({ password: "Invalid credentials" });
+        } catch (err: any) {
+          setErrors(err.response?.data || { general: "خطا در ورود" });
         } finally {
           setSubmitting(false);
         }
@@ -29,8 +29,19 @@ const LoginForm = () => {
     >
       <Form className="flex flex-col gap-20 w-max p-4">
         <div className="grid grid-cols-2 not-lg:grid-cols-1 gap-y-6 gap-x-10">
-          <FormInput name="username" label="نام کاربری" required />
-          <FormInput name="password" label="رمز عبور" required />
+          <FormInput
+            name="username"
+            label="نام کاربری"
+            required
+            autoComplete="username"
+          />
+          <FormInput
+            name="password"
+            label="رمز عبور"
+            type="password"
+            required
+            autoComplete="password"
+          />
         </div>
         <div className="flex flex-row justify-between px-5">
           <Button text="ورود" type="submit" style="submit" />

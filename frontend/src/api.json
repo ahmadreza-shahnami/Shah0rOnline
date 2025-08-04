@@ -1,6 +1,6 @@
 {
   "auth": {
-    "login": "/auth/jwt/create/",
-    "register": "/auth/users/"
+    "login": "/account/login/",
+    "register": "/account/register/"
   }
 }

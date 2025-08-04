@@ -3,11 +3,15 @@ import { ErrorMessage, Field } from "formik";
 const FormInput = ({
   name,
   label,
+  type = "text",
   required,
+  ...props
 }: {
   name: string;
   label: string;
+  type?: string;
   required?: boolean;
+  [key: string]: any;
 }) => {
   return (
     <div className="relative w-full grid grid-cols-2 justify-between">
@@ -19,7 +23,9 @@ const FormInput = ({
       </label>
       <Field
         name={name}
+        type={type}
         className={`border border-black/25 rounded-lg py-1 px-4 `}
+        {...props}
       />
       <ErrorMessage
         name={name}

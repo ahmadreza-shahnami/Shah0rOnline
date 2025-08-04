@@ -2,7 +2,8 @@ import axios from "axios";
 import Cookies from "universal-cookie";
 
 const cookies = new Cookies();
-const instance = axios.create({ baseURL: "/api" });
+const baseURL = import.meta.env.VITE_APP_API_URL || window.location.host === "localhost:5173" ? "http://localhost:8000" : `https://${window.location.host}`;
+const instance = axios.create({ baseURL: baseURL });
 
 instance.interceptors.request.use(
     (config) => {

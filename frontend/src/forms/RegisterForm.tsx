@@ -81,10 +81,16 @@ const RegisterForm = () => {
         <div className="grid grid-cols-2 not-lg:grid-cols-1 gap-y-6 gap-x-10">
           <FormInput name="username" label="نام کاربری" required />
           <FormInput name="phone" label="شماره تلفن" required />
-          <FormInput name="password" label="رمز عبور" required />
+          <FormInput
+            name="password"
+            label="رمز عبور"
+            type="password"
+            required
+          />
           <FormInput
             name="confirm_password"
             label="تاییدیه رمز عبور"
+            type="password"
             required
           />
           <FormInput name="first_name" label="نام" required />
