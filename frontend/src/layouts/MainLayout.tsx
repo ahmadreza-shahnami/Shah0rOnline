@@ -1,6 +1,6 @@
 import * as React from "react";
 import NavBar from "../components/NavBar";
-import HamburgerBar from "../components/hamburgerBar";
+import HamburgerBar from "../components/HamburgerBar";
 import Footer from "../components/Footer";
 
 const MainLayout = ({
