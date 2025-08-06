@@ -3,14 +3,41 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import Cookies, { type CookieChangeListener } from "universal-cookie";
 import apiEndpoint from "../api.json";
 import instance from "../utils/axios";
-// import { jwtDecode, type JwtPayload } from "jwt-decode";
+import { jwtDecode, type JwtPayload } from "jwt-decode";
 
 const cookies = new Cookies();
 
 const AuthContext = createContext<any>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [user, setUser] = useState<object | null>(null);
+
+  useEffect(() => {
+    const handleUserChange: CookieChangeListener = ({ name, value }) => {
+      if (name === "user") {
+        setIsLoggedIn(!!value);
+        if (value) {
+          try {
+            setUser(value);
+          } catch (e) {
+            setUser(null);
+            cookies.remove("user");
+            cookies.remove("accessToken");
+            cookies.remove("refreshToken");
+          }
+        } else {
+          setUser(null);
+        }
+      }
+    };
+
+    cookies.addChangeListener(handleUserChange);
+
+    return () => {
+      cookies.removeChangeListener(handleUserChange);
+    };
+  }, []);
 
   // useEffect(() => {
   //   const handleTokenChange: CookieChangeListener = ({ name, value }) => {
@@ -41,27 +68,46 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (credentials: Credential) => {
     const { data } = await instance.post(apiEndpoint.auth.login, credentials);
-    setUser(data.data);
-    cookies.set("accessToken", data.tokens.access, { path: "/" });
-    cookies.set("refreshToken", data.tokens.refresh, { path: "/" });
+    const accessDecoderExp = jwtDecode<JwtPayload>(data.tokens.access).exp || 0;
+    const refreshDecoderExp =
+      jwtDecode<JwtPayload>(data.tokens.refresh).exp || 0;
+    cookies.set("user", data.data, { path: "/" });
+    cookies.set("accessToken", data.tokens.access, {
+      path: "/",
+      expires: new Date(accessDecoderExp),
+    });
+    cookies.set("refreshToken", data.tokens.refresh, {
+      path: "/",
+      expires: new Date(refreshDecoderExp),
+    });
   };
   const register = async (credentials: Credential) => {
     const { data } = await instance.post(
       apiEndpoint.auth.register,
       credentials
     );
-    setUser(data.data);
-    cookies.set("accessToken", data.tokens.access, { path: "/" });
-    cookies.set("refreshToken", data.tokens.refresh, { path: "/" });
+    const accessDecoderExp = jwtDecode<JwtPayload>(data.tokens.access).exp || 0;
+    const refreshDecoderExp =
+      jwtDecode<JwtPayload>(data.tokens.refresh).exp || 0;
+    cookies.set("user", data.data, { path: "/" });
+    cookies.set("accessToken", data.tokens.access, {
+      path: "/",
+      expires: new Date(accessDecoderExp),
+    });
+    cookies.set("refreshToken", data.tokens.refresh, {
+      path: "/",
+      expires: new Date(refreshDecoderExp),
+    });
   };
 
   const logout = () => {
+    cookies.remove("user", { path: "/" });
     cookies.remove("accessToken", { path: "/" });
     cookies.remove("refreshToken", { path: "/" });
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isLoggedIn, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

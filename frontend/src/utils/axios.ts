@@ -1,4 +1,5 @@
 import axios from "axios";
+import { jwtDecode, type JwtPayload } from "jwt-decode";
 import Cookies from "universal-cookie";
 
 const cookies = new Cookies();
@@ -27,10 +28,23 @@ instance.interceptors.response.use(
                 const { data } = await axios.post("/api/auth/refresh", {
                     refresh: refreshToken,
                 });
-                cookies.set("accessToken", data.access, { path: "/" });
+                const accessDecoderExp = jwtDecode<JwtPayload>(data.access).exp || 0;
+                    const refreshDecoderExp =
+                      jwtDecode<JwtPayload>(data.refresh).exp || 0;
+                    cookies.set("accessToken", data.tokens.access, {
+                      path: "/",
+                      expires: new Date(accessDecoderExp),
+                    });
+                    cookies.set("refreshToken", data.tokens.refresh, {
+                      path: "/",
+                      expires: new Date(refreshDecoderExp),
+                    });
                 originalRequest.headers.Authorization = `Bearer ${data.access}`;
                 return axios(originalRequest);
             } catch (e) {
+                cookies.remove("user", { path: "/" });
+                cookies.remove("accessToken", { path: "/" });
+                cookies.remove("refreshToken", { path: "/" });
                 window.location.replace("/login")
                 return Promise.reject(e);
             }
@@ -38,5 +52,6 @@ instance.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
 
 export default instance;
