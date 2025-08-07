@@ -2,6 +2,7 @@ import * as React from "react";
 import NavBar from "../components/NavBar";
 import HamburgerBar from "../components/HamburgerBar";
 import Footer from "../components/Footer";
+import clsx from "clsx";
 
 const MainLayout = ({
   children,
@@ -18,12 +19,18 @@ const MainLayout = ({
     <div className="relative">
       {hasNavbar && (
         <NavBar
-          className={`not-lg:hidden block fixed top-0 right-0 h-[50px]`}
+          className={`not-md:hidden block fixed top-0 left-0 right-0 mx-auto h-[50px] max-w-6xl `}
         />
       )}
-      {hasNavbar && <HamburgerBar className="lg:hidden fixed top-1 right-1" />}
-      <main className={`lg:mt-[50px] max-w-4xl not-lg:max-w-md mx-auto`}>
-        {title && <h1 className="font-bold text-3xl py-5 mb-16">{title}</h1>}
+      {hasNavbar && <HamburgerBar className="md:hidden block" />}
+      <main
+        className={clsx(
+          "md:mt-[50px] max-w-6xl not-md:max-w-screen mx-auto bg-slate-50 px-12 py-4 md:min-h-[calc(100vh-50px)] not-md:min-h-screen"
+        )}
+      >
+        {title && (
+          <h1 className="font-bold text-3xl pt-10 pb-5 mb-16">{title}</h1>
+        )}
         {children}
       </main>
       {hasFooter && <Footer />}

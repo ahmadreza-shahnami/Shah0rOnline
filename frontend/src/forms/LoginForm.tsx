@@ -27,8 +27,8 @@ const LoginForm = () => {
         }
       }}
     >
-      <Form className="flex flex-col gap-20 w-max p-4">
-        <div className="grid grid-cols-2 not-lg:grid-cols-1 gap-y-6 gap-x-10">
+      <Form className="flex flex-col gap-20 p-4">
+        <div className="grid grid-cols-2 max-w-3xl mx-auto not-md:grid-cols-1 gap-y-6 gap-x-10 not-md:max-w-sm">
           <FormInput
             name="username"
             label="نام کاربری"
@@ -40,7 +40,7 @@ const LoginForm = () => {
             label="رمز عبور"
             type="password"
             required
-            autoComplete="password"
+            autoComplete="current-password"
           />
         </div>
         <div className="flex flex-row justify-between px-5">

@@ -10,8 +10,8 @@ const cookies = new Cookies();
 const AuthContext = createContext<any>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [user, setUser] = useState<object | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(!!cookies.get("user"));
+  const [user, setUser] = useState<object | null>(cookies.get("user"));
 
   useEffect(() => {
     const handleUserChange: CookieChangeListener = ({ name, value }) => {
@@ -65,9 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   //     cookies.removeChangeListener(handleTokenChange);
   //   };
   // }, []);
-
-  const login = async (credentials: Credential) => {
-    const { data } = await instance.post(apiEndpoint.auth.login, credentials);
+  const setCookies = (data: any) => {
     const accessDecoderExp = jwtDecode<JwtPayload>(data.tokens.access).exp || 0;
     const refreshDecoderExp =
       jwtDecode<JwtPayload>(data.tokens.refresh).exp || 0;
@@ -81,23 +79,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       expires: new Date(refreshDecoderExp),
     });
   };
+
+  const login = async (credentials: Credential) => {
+    const { data } = await instance.post(apiEndpoint.auth.login, credentials);
+    setCookies(data);
+  };
   const register = async (credentials: Credential) => {
     const { data } = await instance.post(
       apiEndpoint.auth.register,
       credentials
     );
-    const accessDecoderExp = jwtDecode<JwtPayload>(data.tokens.access).exp || 0;
-    const refreshDecoderExp =
-      jwtDecode<JwtPayload>(data.tokens.refresh).exp || 0;
-    cookies.set("user", data.data, { path: "/" });
-    cookies.set("accessToken", data.tokens.access, {
-      path: "/",
-      expires: new Date(accessDecoderExp),
-    });
-    cookies.set("refreshToken", data.tokens.refresh, {
-      path: "/",
-      expires: new Date(refreshDecoderExp),
-    });
+    setCookies(data);
   };
 
   const logout = () => {
