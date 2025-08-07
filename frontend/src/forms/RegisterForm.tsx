@@ -1,9 +1,8 @@
-import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router";
 import Button from "../components/Button";
-import FormInput from "../components/FormInput";
+import BaseForm from "./BaseForm";
 
 const RegisterForm = () => {
   const { register } = useAuth();
@@ -63,7 +62,7 @@ const RegisterForm = () => {
   });
 
   return (
-    <Formik
+    <BaseForm
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={async (values, { setSubmitting, setErrors }) => {
@@ -76,38 +75,48 @@ const RegisterForm = () => {
           setSubmitting(false);
         }
       }}
-    >
-      <Form className="flex flex-col gap-20 p-4">
-        <div className="grid grid-cols-2 max-w-3xl mx-auto not-md:grid-cols-1 gap-y-6 gap-x-10 not-md:max-w-sm">
-          <FormInput
-            name="username"
-            label="نام کاربری"
-            required
-            autoComplete="username"
-          />
-          <FormInput
-            name="phone"
-            label="شماره تلفن"
-            required
-            autoComplete="tel"
-          />
-          <FormInput
-            name="password"
-            label="رمز عبور"
-            type="password"
-            required
-            autoComplete="new-password"
-          />
-          <FormInput
-            name="confirm_password"
-            label="تاییدیه رمز عبور"
-            type="password"
-            required
-            autoComplete="new-password"
-          />
-          <FormInput name="first_name" label="نام" required autoComplete="given-name"/>
-          <FormInput name="last_name" label="نام خانوادگی" required autoComplete="family-name"/>
-        </div>
+      inputList={[
+        {
+          name: "username",
+          label: "نام کاربری",
+          required: true,
+          autoComplete: "username",
+        },
+        {
+          name: "phone",
+          label: "شماره تلفن",
+          type: "tel",
+          required: true,
+          autoComplete: "tel",
+        },
+        {
+          name: "password",
+          label: "رمز عبور",
+          type: "password",
+          required: true,
+          autoComplete: "new-password",
+        },
+        {
+          name: "confirm_password",
+          label: "تاییدیه رمز عبور",
+          type: "password",
+          required: true,
+          autoComplete: "new-password",
+        },
+        {
+          name: "first_name",
+          label: "نام",
+          required: true,
+          autoComplete: "given-name",
+        },
+        {
+          name: "last_name",
+          label: "نام خانوادگی",
+          required: true,
+          autoComplete: "family-name",
+        },
+      ]}
+      submitButton={
         <div className="flex flex-row justify-between px-5">
           <Button text="ثبت‌نام" type="submit" style="submit" />
           <Link
@@ -117,8 +126,8 @@ const RegisterForm = () => {
             حساب کاربری دارید؟ کلیک کنید.
           </Link>
         </div>
-      </Form>
-    </Formik>
+      }
+    />
   );
 };
 

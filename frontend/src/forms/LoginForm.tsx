@@ -1,16 +1,15 @@
-import { Formik, Form} from "formik";
 import * as Yup from "yup";
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router";
 import Button from "../components/Button";
-import FormInput from "../components/FormInput";
+import BaseForm from "./BaseForm";
 
 const LoginForm = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
   return (
-    <Formik
+    <BaseForm
       initialValues={{ username: "", password: "" }}
       validationSchema={Yup.object({
         username: Yup.string().required("نام کاربری الزامی است."),
@@ -26,23 +25,22 @@ const LoginForm = () => {
           setSubmitting(false);
         }
       }}
-    >
-      <Form className="flex flex-col gap-20 p-4">
-        <div className="grid grid-cols-2 max-w-3xl mx-auto not-md:grid-cols-1 gap-y-6 gap-x-10 not-md:max-w-sm">
-          <FormInput
-            name="username"
-            label="نام کاربری"
-            required
-            autoComplete="username"
-          />
-          <FormInput
-            name="password"
-            label="رمز عبور"
-            type="password"
-            required
-            autoComplete="current-password"
-          />
-        </div>
+      inputList={[
+        {
+          name: "username",
+          label: "نام کاربری",
+          required: true,
+          autoComplete: "username",
+        },
+        {
+          name: "password",
+          label: "رمز عبور",
+          type: "password",
+          required: true,
+          autoComplete: "current-password",
+        },
+      ]}
+      submitButton={
         <div className="flex flex-row justify-between px-5">
           <Button text="ورود" type="submit" style="submit" />
           <Link
@@ -52,8 +50,8 @@ const LoginForm = () => {
             حساب کاربری ندارید؟ کلیک کنید.
           </Link>
         </div>
-      </Form>
-    </Formik>
+      }
+    />
   );
 };
 

@@ -1,18 +1,20 @@
 import { ErrorMessage, Field } from "formik";
 
+export interface Input {
+  name: string;
+  label: string;
+  type?: "text" | "password" | "email" | "tel";
+  required?: boolean;
+  [key: string]: any;
+}
+
 const FormInput = ({
   name,
   label,
   type = "text",
   required,
   ...props
-}: {
-  name: string;
-  label: string;
-  type?: string;
-  required?: boolean;
-  [key: string]: any;
-}) => {
+}: Input) => {
   return (
     <div className="relative w-full grid grid-cols-2 justify-between">
       <label htmlFor={name} className="relative text-black font-semibold">
@@ -30,7 +32,7 @@ const FormInput = ({
       <ErrorMessage
         name={name}
         component={"div"}
-        className="absolute text-xs right-[50%] text-red-600 top-full before:content-['*']"
+        className="absolute text-xs right-[50%] text-red-600 top-full w-max before:content-['*']"
       />
     </div>
   );
