@@ -7,11 +7,11 @@ const ProtectedRoute = ({
   role = null,
 }: {
   children: React.ReactNode;
-  role: string | null;
+  role?: string | null;
 }) => {
-  const { user, loading } = useAuth();
-  if (loading) return <div>Loading...</div>;
-  if (!user) return <Navigate to="/login" replace />;
+  const { user, isLoggedIn } = useAuth();
+  // if (loading) return <div>Loading...</div>;
+  if (!isLoggedIn) return <Navigate to="/login" replace />;
   if (role && user.role !== role)
     return <Navigate to="/unauthorized" replace />;
   return children;

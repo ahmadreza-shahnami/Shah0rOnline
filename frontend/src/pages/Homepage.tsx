@@ -2,26 +2,24 @@ import * as React from "react";
 import { Link } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import MainLayout from "../layouts/MainLayout";
-import instance from "../utils/axios";
-import { test } from "../api.json";
 
 const modules = [
   {
-    name: "مدیریت مدرسه",
-    description: "ثبت کلاس‌ها، معلم‌ها و دانش‌آموزان",
-    path: "/school",
+    name: "لیست مدارس",
+    description: "لیست مدارس ثبت شده در سامانه",
+    path: "/schools",
   },
-  { name: "آموزش", description: "دروس، امتحانات، نمرات", path: "/education" },
-  {
-    name: "ارتباطات",
-    description: "پیام‌ها، اطلاعیه‌ها و ارتباط اولیا",
-    path: "/communication",
-  },
-  {
-    name: "فروشگاه",
-    description: "مدیریت پرداخت‌ها، کیف پول و خریدها",
-    path: "/shop",
-  },
+  { name: "ثبت مدرسه", description: "ثبت مدرسه در سامانه", path: "/schools/register" },
+  // {
+  //   name: "ارتباطات",
+  //   description: "پیام‌ها، اطلاعیه‌ها و ارتباط اولیا",
+  //   path: "/communication",
+  // },
+  // {
+  //   name: "فروشگاه",
+  //   description: "مدیریت پرداخت‌ها، کیف پول و خریدها",
+  //   path: "/shop",
+  // },
 ];
 
 const HomePage = () => {
@@ -32,7 +30,7 @@ const HomePage = () => {
         <h1 className="text-3xl font-bold text-center text-blue-700 mt-10">
           به سامانه مدارس هوشمند خوش آمدید
         </h1>
-        <p className="max-w-xl text-slate-700 text-justify">
+        <p className="max-w-xl text-slate-700 text-balance text-center">
           این سامانه با هدف یکپارچه‌سازی مدیریت، آموزش و ارتباط در مدارس طراحی
           شده است. با امکانات متنوع برای مدیر، معلم، والدین و دانش‌آموزان.
         </p>
