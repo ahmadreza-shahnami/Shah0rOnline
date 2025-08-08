@@ -4,5 +4,7 @@
     "register": "/account/register/",
     "refresh": "/token/refresh/"
   },
-  "test":"/admin"
+  "school": {
+    "schools": "/school/schools"
+  }
 }

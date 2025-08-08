@@ -8,6 +8,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import RegisterSchool from "./pages/RegisterSchool";
 import UnAuthorized from "./pages/UnAuthorized";
 import NotFound from "./pages/NotFound";
+import SchoolsList from "./pages/SchoolsList";
 
 function App() {
   return (
@@ -25,8 +26,9 @@ function App() {
           </ProtectedRoute>
         }
       />
-      {/* Home Page */}
+      {/* Allow Any Pages */}
       <Route path="/" element={<HomePage />} />
+      <Route path="/schools" element={<SchoolsList />} />
       {/* Error Pages */}
       <Route path="/unauthorized" element={<UnAuthorized />} />
       <Route path="*" element={<NotFound />} />
