@@ -1,12 +1,13 @@
 import * as Yup from "yup";
 import { useAuth } from "../context/AuthContext";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import Button from "../components/Button";
 import BaseForm from "./BaseForm";
 
 const RegisterForm = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const initialValues = {
     username: "",
     password: "",
@@ -68,7 +69,7 @@ const RegisterForm = () => {
       onSubmit={async (values, { setSubmitting, setErrors }) => {
         try {
           await register(values);
-          navigate("/login");
+          navigate(searchParams.get("next") || "/");
         } catch (err) {
           setErrors({ password: "Invalid credentials" });
         } finally {
@@ -121,7 +122,7 @@ const RegisterForm = () => {
           <Button text="ثبت‌نام" type="submit" style="submit" />
           <Link
             className="text-sm text-blue-600 underline w-fit underline-offset-2 font-semibold hover:text-blue-700 cursor-pointer"
-            to={"/login"}
+            to={{ pathname: "/login", search: searchParams.toString() || "" }}
           >
             حساب کاربری دارید؟ کلیک کنید.
           </Link>

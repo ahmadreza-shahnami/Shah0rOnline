@@ -22,7 +22,6 @@ instance.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
-        console.log("Fdfdf")
         if (error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
@@ -47,7 +46,7 @@ instance.interceptors.response.use(
                 cookies.remove("user", { path: "/" });
                 cookies.remove("accessToken", { path: "/" });
                 cookies.remove("refreshToken", { path: "/" });
-                window.location.replace("/login")
+                window.location.replace(`/login?next=${window.location.pathname}`)
                 return Promise.reject(e);
             }
         }

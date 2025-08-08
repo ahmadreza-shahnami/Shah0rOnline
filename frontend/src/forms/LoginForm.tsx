@@ -1,12 +1,13 @@
 import * as Yup from "yup";
 import { useAuth } from "../context/AuthContext";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
 import Button from "../components/Button";
 import BaseForm from "./BaseForm";
 
 const LoginForm = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   return (
     <BaseForm
@@ -18,7 +19,7 @@ const LoginForm = () => {
       onSubmit={async (values, { setSubmitting, setErrors }) => {
         try {
           await login(values);
-          navigate("/");
+          navigate(searchParams.get("next") || "/");
         } catch (err: any) {
           setErrors(err.response?.data || { general: "خطا در ورود" });
         } finally {
@@ -45,7 +46,10 @@ const LoginForm = () => {
           <Button text="ورود" type="submit" style="submit" />
           <Link
             className="text-sm text-blue-600 underline w-fit underline-offset-2 font-semibold hover:text-blue-700 cursor-pointer"
-            to={"/register"}
+            to={{
+              pathname: "/register",
+              search: searchParams.toString() || "",
+            }}
           >
             حساب کاربری ندارید؟ کلیک کنید.
           </Link>

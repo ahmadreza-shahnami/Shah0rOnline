@@ -9,6 +9,7 @@ import RegisterSchool from "./pages/RegisterSchool";
 import UnAuthorized from "./pages/UnAuthorized";
 import NotFound from "./pages/NotFound";
 import SchoolsList from "./pages/SchoolsList";
+import SchoolDashboard from "./pages/SchoolDashboard";
 
 function App() {
   return (
@@ -23,6 +24,14 @@ function App() {
         element={
           <ProtectedRoute>
             <RegisterSchool />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/schools/:slug"
+        element={
+          <ProtectedRoute>
+            <SchoolDashboard />
           </ProtectedRoute>
         }
       />

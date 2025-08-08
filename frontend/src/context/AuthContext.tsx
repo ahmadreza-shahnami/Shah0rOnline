@@ -72,11 +72,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     cookies.set("user", data.data, { path: "/" });
     cookies.set("accessToken", data.tokens.access, {
       path: "/",
-      expires: new Date(accessDecoderExp),
+      expires: new Date(accessDecoderExp * 1000),
     });
+    console.log();
     cookies.set("refreshToken", data.tokens.refresh, {
       path: "/",
-      expires: new Date(refreshDecoderExp),
+      expires: new Date(refreshDecoderExp * 1000),
     });
   };
 
@@ -84,6 +85,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data } = await instance.post(apiEndpoint.auth.login, credentials);
     setCookies(data);
   };
+
   const register = async (credentials: Credential) => {
     const { data } = await instance.post(
       apiEndpoint.auth.register,

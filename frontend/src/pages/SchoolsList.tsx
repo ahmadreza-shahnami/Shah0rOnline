@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import MainLayout from "../layouts/MainLayout";
 import instance from "../utils/axios";
 import { school } from "../api.json";
+import { useNavigate } from "react-router";
 
 type School = {
   id: number;
@@ -18,6 +19,7 @@ const SchoolsList = () => {
   const [search, setSearch] = useState("");
   const [type, setType] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState(search);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSearch(search), 1000);
@@ -73,6 +75,7 @@ const SchoolsList = () => {
           <div
             key={school.id}
             className="border rounded-lg p-4 shadow hover:shadow-lg transition"
+            onClick={() => navigate(school.slug)}
           >
             <h2 className="font-bold text-lg">{school.name}</h2>
             <p className="text-gray-600">{school.city_name}</p>
