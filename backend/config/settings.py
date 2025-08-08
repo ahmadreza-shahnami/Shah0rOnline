@@ -48,10 +48,11 @@ INSTALLED_APPS = [
     'school',
     'deleted_obj',
     # extenal apps
-    'rest_framework',
-    'corsheaders',
-    'rest_framework_simplejwt',
+    'django_filters',
     'drf_spectacular',
+    'corsheaders',
+    'rest_framework',
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [

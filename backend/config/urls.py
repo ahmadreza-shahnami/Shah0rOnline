@@ -31,5 +31,6 @@ urlpatterns = [
     # intenal apps
     path('shop/', include('shop.urls')),
     path('account/', include('account.urls')),
+    path('school/', include('school.urls')),
     
 ]
