@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from django.utils import timezone
 from role.models import Role, Scope
 from location.models import City
@@ -75,6 +76,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
                     break  
     
     def get_tokens(self):
+        if not self.is_active:
+            raise AuthenticationFailed("User is not active")
         refresh = RefreshToken.for_user(self)
         return {
             'refresh': str(refresh),
