@@ -1,13 +1,16 @@
 import { useParams } from "react-router";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import instance from "../utils/axios";
+import { Loader } from "../components/Loader"; // لوودر جداگانه
+import { RolePanel } from "../components/RolePanel"; // پنل نقش‌ها
+import Button from "../components/Button";
+import SchoolLayout from "../layouts/SchoolLayout";
 
 interface School {
   name: string;
   slug: string;
-  type: string;
-  city: string;
+  type_display: string;
+  city_name: string;
 }
 
 interface Membership {
@@ -22,15 +25,24 @@ export default function SchoolDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchSchoolData = async () => {
       try {
         const schoolRes = await instance.get(`/school/schools/${slug}/`);
-        setSchool(schoolRes.data);
 
+        setSchool(schoolRes.data);
+      } catch (err) {
+        console.error("Error loading school:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchMemberData = async () => {
+      try {
         const membershipRes = await instance.get(
           `/school/schools/${slug}/membership/`
         );
-        console.log(membershipRes);
+
         setMembership(membershipRes.data);
       } catch (err) {
         console.error("Error loading school:", err);
@@ -39,41 +51,35 @@ export default function SchoolDashboard() {
       }
     };
 
-    fetchData();
+    fetchMemberData();
+    fetchSchoolData();
   }, [slug]);
 
-  if (loading) return <p>در حال بارگذاری...</p>;
-  if (!school) return <p>مدرسه یافت نشد.</p>;
+  if (loading) return <Loader message="در حال بارگذاری اطلاعات مدرسه..." />;
+  if (!school)
+    return <p className="text-center text-red-500">مدرسه یافت نشد.</p>;
 
   return (
-    <div className="p-5">
-      <h1 className="text-3xl font-bold mb-4">{school.name}</h1>
-      <p className="text-gray-700 mb-6">
-        نوع مدرسه: {school.type} - شهر: {school.city}
-      </p>
-
-      {!membership && (
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-          ثبت‌نام در مدرسه
-        </button>
-      )}
-
-      {membership && !membership.is_approved && (
-        <p className="text-yellow-600">درخواست شما در انتظار تایید مدیر است.</p>
-      )}
-
-      {membership && membership.is_approved && (
-        <div>
-          <p className="text-green-600 mb-4">
-            شما به عنوان "{membership.role}" عضو هستید.
+    <SchoolLayout>
+      {/* هدر مدرسه */}
+      <header className="mb-6 border-b pb-4">
+        <h1 className="text-3xl font-extrabold text-gray-800">{school.name}</h1>
+        <p className="text-gray-600 mt-2">
+          نوع مدرسه: {school.type_display} | شهر: {school.city_name}
+        </p>
+      </header>
+      {/* وضعیت عضویت */}
+      <section>
+        {!membership && <Button text="ثبت‌نام" style="submit" />}
+        {membership && !membership.is_approved && (
+          <p className="bg-yellow-100 text-yellow-800 p-3 rounded-lg">
+            درخواست شما در انتظار تایید مدیر است.
           </p>
-          {membership.role === "مدیر" && <p>📌 اینجا منوی مدیریت مدرسه میاد</p>}
-          {membership.role === "معلم" && <p>📌 اینجا پنل معلم میاد</p>}
-          {membership.role === "دانش‌آموز" && (
-            <p>📌 اینجا پنل دانش‌آموز میاد</p>
-          )}
-        </div>
-      )}
-    </div>
+        )}
+        {membership && membership.is_approved && (
+          <RolePanel role={membership.role!} />
+        )}
+      </section>
+    </SchoolLayout>
   );
 }

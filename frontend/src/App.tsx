@@ -35,6 +35,14 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/schools/:slug/students/new"
+        element={
+          <ProtectedRoute>
+            <SchoolDashboard />
+          </ProtectedRoute>
+        }
+      />
       {/* Allow Any Pages */}
       <Route path="/" element={<HomePage />} />
       <Route path="/schools" element={<SchoolsList />} />
