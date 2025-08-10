@@ -10,6 +10,8 @@ import UnAuthorized from "./pages/UnAuthorized";
 import NotFound from "./pages/NotFound";
 import SchoolsList from "./pages/SchoolsList";
 import SchoolDashboard from "./pages/SchoolDashboard";
+import NewsList from "./pages/NewsList";
+import NewsDetail from "./pages/NewsDetail";
 
 function App() {
   return (
@@ -28,14 +30,6 @@ function App() {
         }
       />
       <Route
-        path="/schools/:slug"
-        element={
-          <ProtectedRoute>
-            <SchoolDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
         path="/schools/:slug/students/new"
         element={
           <ProtectedRoute>
@@ -46,6 +40,9 @@ function App() {
       {/* Allow Any Pages */}
       <Route path="/" element={<HomePage />} />
       <Route path="/schools" element={<SchoolsList />} />
+      <Route path="/schools/:slug" element={<SchoolDashboard />} />
+      <Route path="/schools/:slug/news" element={<NewsList />} />
+      <Route path="/schools/:slug/news/:newsslug" element={<NewsDetail />} />
       {/* Error Pages */}
       <Route path="/unauthorized" element={<UnAuthorized />} />
       <Route path="*" element={<NotFound />} />

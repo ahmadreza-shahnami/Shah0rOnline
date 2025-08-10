@@ -37,7 +37,9 @@ const SchoolsList = () => {
           type: type || undefined,
         },
       })
-      .then((res) => setSchools(res.data))
+      .then((res) => {
+        setSchools(res.data.results);
+      })
       .catch(() => setError("خطا در دریافت اطلاعات"))
       .finally(() => setLoading(false));
   }, [debouncedSearch, type]);

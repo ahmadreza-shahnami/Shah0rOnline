@@ -23,9 +23,10 @@ const SchoolLayout = ({
   const navItem = [
     { to: "/", label: "سایت اصلی" },
     { to: `${basePath}`, label: "خانه" },
+    { to: `${basePath}/news`, label: "اخبار" },
     { to: `${basePath}/students/new`, label: "ثبت نام" },
   ];
-  
+
   return (
     <div className="relative">
       {hasNavbar && (
