@@ -1,9 +1,12 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from django.shortcuts import get_object_or_404
+from django.contrib.contenttypes.models import ContentType
 from rest_framework import viewsets, permissions, views
 from rest_framework.exceptions import NotFound
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
-from .models import School, Membership, News
+from article.models import NewsArticle
+from .models import School, Membership
 from .serializers import SchoolSerializer, MembershipSerializer, NewsSerializer
 from .filters import SchoolFilter
 from .permissions import IsSchoolNewsEditor
@@ -18,6 +21,7 @@ class SchoolViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ["name", "city__name"]
     ordering_fields = ["name", "city__name"]
     ordering = ["name"]  # پیش‌فرض مرتب‌سازی بر اساس اسم
+
 
 class MembershipAPIView(views.APIView):
     # permission_classes= [permissions.AllowAny]
@@ -35,9 +39,8 @@ class MembershipAPIView(views.APIView):
 
 
 class NewsViewSet(viewsets.ModelViewSet):
-    queryset = News.objects.all().order_by('-created_at')
+    queryset = NewsArticle.objects.all().order_by('-created_at')
     serializer_class = NewsSerializer
-    permission_classes = [permissions.AllowAny]  
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     lookup_field = "slug"
     filterset_fields = ["published"]
@@ -46,25 +49,33 @@ class NewsViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         school_slug = self.kwargs.get('school_slug')
-        # if school_slug:
-        return self.queryset.filter(school__slug=school_slug)
-        # return self.queryset
+        school = School.objects.get(slug=school_slug)
+
+        return self.queryset.filter(content_type=ContentType.objects.get_for_model(School),
+            object_id=school.id)
     
     def get_permissions(self):
-        if self.request.method == "GET":
-            return [permissions.AllowAny()]
+        # if self.request.method == "GET":
+            # return [permissions.AllowAny()]
         return [IsSchoolNewsEditor()]
-    
-    def perform_create(self, serializer):
-        school_slug = self.kwargs.get('school_slug')
-        serializer.save(author=self.request.user, school__slug=school_slug)
 
     def get_object(self):
-        slug = self.kwargs.get('slug')
         school_slug = self.kwargs.get('school_slug')
+        school = School.objects.get(slug=school_slug)
+
+        slug = self.kwargs.get('slug')
         try:
-            return self.queryset.get(school__slug=school_slug, slug=slug)
-        except News.objects.DoesNotExist:
+            return self.queryset.get(content_type=ContentType.objects.get_for_model(School),
+                                    object_id=school.id, slug=slug)
+        except NewsArticle.DoesNotExist:
             raise NotFound("news for the given school and title does not exist.")
+        
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        related_object = None
+        if "school_slug" in self.kwargs:
+            related_object = get_object_or_404(School, slug=self.kwargs["school_slug"])
+        context["related_object"] = related_object
+        return context
         
 

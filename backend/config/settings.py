@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     # intenal apps
     'account',
     'location',
+    'article',
     'role',
     'wallet',
     'shop',
