@@ -5,11 +5,13 @@ from rest_framework import viewsets, permissions, views
 from rest_framework.exceptions import NotFound
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from article.models import NewsArticle
-from .models import School, Membership
-from .serializers import SchoolSerializer, MembershipSerializer, NewsSerializer
+from .models import School, Membership, Grade, Classroom
+from .serializers import SchoolSerializer, MembershipSerializer, NewsSerializer,\
+      GradeSerializer, ClassroomSerializer
 from .filters import SchoolFilter
-from .permissions import IsSchoolNewsEditor
+from .permissions import IsSchoolNewsEditor, HasSchoolPermission
 
 class SchoolViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = School.objects.filter(approved=True)
@@ -37,11 +39,36 @@ class MembershipAPIView(views.APIView):
         serializer = MembershipSerializer(config)
         return Response(serializer.data)
 
+class GradeViewSet(viewsets.ModelViewSet):
+    queryset = Grade.objects.all()
+    serializer_class = GradeSerializer
+    permission_classes = [HasSchoolPermission]
+    permission_level = 5
+    permission_safe_methodes = True
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["name", "description"]
+    ordering_fields = ["name"]
+    ordering = ["name"]  
 
+
+class ClassroomViewSet(viewsets.ModelViewSet):
+    queryset = Classroom.objects.all()
+    serializer_class = ClassroomSerializer
+    permission_classes = [HasSchoolPermission]
+    permission_level = 7
+    permission_safe_methodes = True
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["name"]
+    ordering_fields = ["name"]
+    ordering = ["name"]  
+
+
+# Dependent Views
 class NewsViewSet(viewsets.ModelViewSet):
     queryset = NewsArticle.objects.all().order_by('-created_at')
     serializer_class = NewsSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    pagination_class = PageNumberPagination
     lookup_field = "slug"
     filterset_fields = ["published"]
     search_fields = ["title", "body", "author__first_name", "author__last_name"]

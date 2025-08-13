@@ -38,7 +38,7 @@ const SchoolsList = () => {
         },
       })
       .then((res) => {
-        setSchools(res.data.results);
+        setSchools(res.data);
       })
       .catch(() => setError("خطا در دریافت اطلاعات"))
       .finally(() => setLoading(false));

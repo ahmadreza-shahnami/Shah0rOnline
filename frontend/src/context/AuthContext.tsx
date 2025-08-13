@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const handleUserChange: CookieChangeListener = ({ name, value }) => {
-      if (name === "user") {
+      if (name === "user" || name === "refreshToken") {
         setIsLoggedIn(!!value);
         if (value) {
           try {

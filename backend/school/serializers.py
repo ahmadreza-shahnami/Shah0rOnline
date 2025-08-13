@@ -2,7 +2,7 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
 from article.models import NewsArticle, Category
 from article.serializers import CategorySerializer
-from .models import School, Membership
+from .models import School, Membership, Grade, Classroom, WeeklySchedule
 
 
 class SchoolSerializer(serializers.ModelSerializer):
@@ -37,6 +37,32 @@ class MembershipSerializer(serializers.ModelSerializer):
             "is_approved"
         ]
 
+
+class GradeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Grade
+        fields = [
+            "id",
+            "school",
+            "name",
+            "description"
+        ]
+
+
+class ClassroomSerializer(serializers.ModelSerializer):
+    grade = serializers.StringRelatedField()
+    teacher = MembershipSerializer()
+    
+    class Meta:
+        model = Classroom
+        fields = [
+            "id",
+            "grade",
+            "name",
+            "teacher"
+        ]
+
+# Dependent Serializers
 class NewsSerializer(serializers.ModelSerializer):
     author_name = serializers.SerializerMethodField()
     categories = CategorySerializer(many=True, read_only=True)
