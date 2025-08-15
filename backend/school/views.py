@@ -1,15 +1,20 @@
+import zipfile
+import os
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.contrib.contenttypes.models import ContentType
-from rest_framework import viewsets, permissions, views
+from django.conf import settings
+from rest_framework import viewsets, permissions, views, status
 from rest_framework.exceptions import NotFound
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import MultiPartParser, FormParser
 from article.models import NewsArticle
-from .models import School, Membership, Grade, Classroom, WeeklySchedule
+from .models import School, Membership, Grade, Classroom, WeeklySchedule, VirtualTour
 from .serializers import SchoolSerializer, MembershipSerializer, NewsSerializer,\
-      GradeSerializer, ClassroomSerializer, WeeklyScheduleSerializer
+      GradeSerializer, ClassroomSerializer, WeeklyScheduleSerializer,\
+      VirtualTourSerializer
 from .filters import SchoolFilter
 from .permissions import IsSchoolNewsEditor, HasSchoolPermission
 
@@ -117,6 +122,45 @@ class WeeklyScheduleViewSet(viewsets.ModelViewSet):
         context["classroom"] = classroom
         return context
 
+
+class VirtualTourAPIView(views.APIView):
+    permission_classes = [HasSchoolPermission]
+    permission_level = 10
+    permission_safe_methodes = True
+
+    def get_object(self, school_slug):
+        try:
+            return VirtualTour.objects.get(school__slug=school_slug)
+        except VirtualTour.DoesNotExist:
+            raise NotFound("VirtualTour for the given school does not exist.")
+
+    def get(self, request, school_slug):
+        config = self.get_object(school_slug)
+        serializer = VirtualTourSerializer(config)
+        return Response(serializer.data)
+   
+    def post(self, request, school_slug):
+        school = get_object_or_404(School, slug=school_slug)
+
+        zip_file = request.FILES.get('zip_file')
+        title = request.data.get('title')
+
+        if not zip_file:
+            return Response({"error": "zip_file is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # ذخیره مدل
+        virtual_tour, created = VirtualTour.objects.get_or_create(
+            school=school,
+            defaults={'title': title, 'zip_file': zip_file}
+        )
+        if not created:
+            virtual_tour.title = title or virtual_tour.title
+            virtual_tour.zip_file = zip_file
+            virtual_tour.save()
+
+        serializer = VirtualTourSerializer(virtual_tour)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
 
 # Dependent Views
 class NewsViewSet(viewsets.ModelViewSet):

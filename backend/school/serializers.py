@@ -2,7 +2,7 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
 from article.models import NewsArticle, Category
 from article.serializers import CategorySerializer
-from .models import School, Membership, Grade, Classroom, WeeklySchedule
+from .models import School, Membership, Grade, Classroom, WeeklySchedule, VirtualTour
 
 
 class SchoolSerializer(serializers.ModelSerializer):
@@ -26,6 +26,8 @@ class SchoolSerializer(serializers.ModelSerializer):
 
 class MembershipSerializer(serializers.ModelSerializer):
     role = serializers.StringRelatedField()
+    user = serializers.StringRelatedField()
+    school = serializers.StringRelatedField()
 
     class Meta:
         model = Membership
@@ -34,13 +36,14 @@ class MembershipSerializer(serializers.ModelSerializer):
             "user",
             "school",
             "role",
+            "classroom",
             "is_approved"
         ]
 
 
 class GradeSerializer(serializers.ModelSerializer):
     school = serializers.StringRelatedField()
-    
+
     class Meta:
         model = Grade
         fields = [
@@ -114,7 +117,20 @@ class WeeklyScheduleSerializer(serializers.ModelSerializer):
         if classroom:
             validated_data['classroom'] = classroom
         return super().update(instance, validated_data)
+    
 
+class VirtualTourSerializer(serializers.ModelSerializer):
+    index_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = VirtualTour
+        fields = ['id', 'school', 'title', 'zip_file', 'uploaded_at', 'index_url']
+        read_only_fields = ['uploaded_at', 'index_url']
+
+    def get_index_url(self, obj):
+        return obj.get_index_url()
+    
+    
 # Dependent Serializers
 class NewsSerializer(serializers.ModelSerializer):
     author_name = serializers.SerializerMethodField()
@@ -188,3 +204,4 @@ class NewsSerializer(serializers.ModelSerializer):
         if category_ids is not None:
             news_item.categories.set(category_ids)
         return news_item
+    

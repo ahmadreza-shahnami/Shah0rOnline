@@ -25,13 +25,13 @@ from rest_framework_simplejwt.views import (
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('login/', TokenObtainPairView.as_view(), name='login'),
+    path('api/admin/', admin.site.urls),
+    path('api/login/', TokenObtainPairView.as_view(), name='login'),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema')),
-    path('token/refresh/', TokenRefreshView.as_view(), name='refresh_token'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='refresh_token'),
     # intenal apps
-    path('shop/', include('shop.urls')),
-    path('account/', include('account.urls')),
-    path('school/', include('school.urls')),
+    path('api/shop/', include('shop.urls')),
+    path('api/account/', include('account.urls')),
+    path('api/school/', include('school.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) if settings.DEBUG else []

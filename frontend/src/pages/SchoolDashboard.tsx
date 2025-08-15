@@ -5,6 +5,8 @@ import { Loader } from "../components/Loader"; // لوودر جداگانه
 import { RolePanel } from "../components/RolePanel"; // پنل نقش‌ها
 import Button from "../components/Button";
 import SchoolLayout from "../layouts/SchoolLayout";
+import GradeModal from "../components/GradeModal";
+import VirtualTour from "../components/VirtualTour";
 
 interface School {
   name: string;
@@ -37,21 +39,6 @@ export default function SchoolDashboard() {
       }
     };
 
-    const fetchMemberData = async () => {
-      try {
-        const membershipRes = await instance.get(
-          `/school/schools/${slug}/membership/`
-        );
-
-        setMembership(membershipRes.data);
-      } catch (err) {
-        console.error("Error loading school:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMemberData();
     fetchSchoolData();
   }, [slug]);
 
@@ -68,17 +55,14 @@ export default function SchoolDashboard() {
           نوع مدرسه: {school.type_display} | شهر: {school.city_name}
         </p>
       </header>
-      {/* وضعیت عضویت */}
       <section>
-        {!membership && <Button text="ثبت‌نام" style="submit" />}
-        {membership && !membership.is_approved && (
-          <p className="bg-yellow-100 text-yellow-800 p-3 rounded-lg">
-            درخواست شما در انتظار تایید مدیر است.
-          </p>
-        )}
-        {membership && membership.is_approved && (
-          <RolePanel role={membership.role!} />
-        )}
+        <GradeModal
+          label="لیست پایه ها"
+          className="bg-green-400 cursor-pointer border transition-all duration-200 ease-in-out border-amber-300 hover:bg-amber-300 text-white px-4 py-2 rounded-lg"
+        />
+      </section>
+      <section>
+        <VirtualTour />
       </section>
     </SchoolLayout>
   );

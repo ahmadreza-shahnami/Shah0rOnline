@@ -1,6 +1,7 @@
 from django.urls import path
 from rest_framework_nested.routers import DefaultRouter, NestedDefaultRouter
-from .views import SchoolViewSet, MembershipAPIView, NewsViewSet, ClassroomViewSet, GradeViewSet, WeeklyScheduleViewSet
+from .views import SchoolViewSet, MembershipAPIView, NewsViewSet, ClassroomViewSet,\
+      GradeViewSet, WeeklyScheduleViewSet, VirtualTourAPIView
 
 router = DefaultRouter()
 router.register(r"schools", SchoolViewSet, basename="school")
@@ -19,4 +20,7 @@ urlpatterns = [
     path('schools/<str:school_slug>/membership/',
          MembershipAPIView.as_view(),
          name='school-membership'),
+    path('schools/<str:school_slug>/virtual-tour/',
+         VirtualTourAPIView.as_view(),
+         name='school-tour')
 ] + router.urls + schools_router.urls + grade_router.urls + classroom_router.urls

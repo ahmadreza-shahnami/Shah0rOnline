@@ -1,8 +1,11 @@
+import os
+import zipfile
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.utils import timezone
+from django.conf import settings
 from location.models import City
 from role.models import Role
 
@@ -165,3 +168,44 @@ class ClassMedia(models.Model):
     title = models.CharField(max_length=100)
     file = models.FileField(upload_to="class_media/")
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+class VirtualTour(models.Model):
+    school = models.OneToOneField(School, on_delete=models.CASCADE, related_name="tour")
+    title = models.CharField(max_length=255)
+    zip_file = models.FileField(upload_to='school_pano_zips/')
+    extracted_path = models.CharField(max_length=255, blank=True)
+    uploaded_at = models.DateTimeField(default=timezone.now)
+
+    def save(self, *args, **kwargs):
+        # اگر تور قبلی وجود داره، پوشه اکسترکت قدیمی رو پاک کن
+        if self.pk and self.extracted_path:
+            old = VirtualTour.objects.filter(pk=self.pk).first()
+            if old and old.extracted_path and os.path.exists(old.extracted_path):
+                import shutil
+                shutil.rmtree(old.extracted_path, ignore_errors=True)
+
+        super().save(*args, **kwargs)
+
+        # اکسترکت کردن فایل زیپ
+        if self.zip_file:
+            extract_to = os.path.join(settings.MEDIA_ROOT, f"school_pano_extracted/{self.school.id}")
+            os.makedirs(extract_to, exist_ok=True)
+
+            with zipfile.ZipFile(self.zip_file.path, 'r') as zip_ref:
+                zip_ref.extractall(extract_to)
+
+            self.extracted_path = extract_to
+            super().save(update_fields=['extracted_path'])
+
+    def get_index_url(self):
+        """
+        مسیر URL عمومی index.html
+        """
+        if self.extracted_path:
+            rel_path = os.path.relpath(self.extracted_path, settings.MEDIA_ROOT)
+            returning_path = f"{settings.MEDIA_URL}{rel_path}/index.html".replace("\\","/")
+            return returning_path
+        return None
+
+    def __str__(self):
+        return f"{self.school.name} - {self.title}"
