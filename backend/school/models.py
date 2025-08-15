@@ -138,8 +138,17 @@ class Classroom(models.Model):
 
 
 class WeeklySchedule(models.Model):
+    DAY_OF_WEEK_CHOICES = [
+        (0, "شنبه"),
+        (1, "یکشنبه"),
+        (2, "دوشنبه"),
+        (3, "سه‌شنبه"),
+        (4, "چهارشنبه"),
+        (5, "پنج‌شنبه"),
+        (6, "جمعه"),
+        ]
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name="weekly_schedules")
-    day_of_week = models.PositiveSmallIntegerField()  # 0=شنبه, 6=جمعه
+    day_of_week = models.PositiveSmallIntegerField(choices=DAY_OF_WEEK_CHOICES,default=0)  # 0=شنبه, 6=جمعه
     subject = models.CharField(max_length=100)
     start_time = models.TimeField()
     end_time = models.TimeField()

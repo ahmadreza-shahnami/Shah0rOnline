@@ -39,6 +39,8 @@ class MembershipSerializer(serializers.ModelSerializer):
 
 
 class GradeSerializer(serializers.ModelSerializer):
+    school = serializers.StringRelatedField()
+    
     class Meta:
         model = Grade
         fields = [
@@ -47,6 +49,17 @@ class GradeSerializer(serializers.ModelSerializer):
             "name",
             "description"
         ]
+
+    def create(self, validated_data):
+        school = self.context.get("school")
+        validated_data['school'] = school
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        school = self.context.get("school")
+        if school:
+            validated_data['school'] = school
+        return super().update(instance, validated_data)
 
 
 class ClassroomSerializer(serializers.ModelSerializer):
@@ -61,6 +74,46 @@ class ClassroomSerializer(serializers.ModelSerializer):
             "name",
             "teacher"
         ]
+
+    def create(self, validated_data):
+        grade = self.context.get("grade")
+        validated_data['grade'] = grade
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        grade = self.context.get("grade")
+        if grade:
+            validated_data['grade'] = grade
+        return super().update(instance, validated_data)
+
+class WeeklyScheduleSerializer(serializers.ModelSerializer):
+    classroom = serializers.StringRelatedField()
+    day_of_week_display = serializers.CharField(source="get_type_display", read_only=True)
+    
+    class Meta:
+        model = WeeklySchedule
+        fields = [
+            "id",
+            "classroom",
+            "day_of_week_display",
+            "subject",
+            "start_time",
+            "end_time",
+        ]
+        extra_kwargs ={
+            'day_of_week': {'write_only': True},
+        }
+
+    def create(self, validated_data):
+        classroom = self.context.get("classroom")
+        validated_data['classroom'] = classroom
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        classroom = self.context.get("classroom")
+        if classroom:
+            validated_data['classroom'] = classroom
+        return super().update(instance, validated_data)
 
 # Dependent Serializers
 class NewsSerializer(serializers.ModelSerializer):

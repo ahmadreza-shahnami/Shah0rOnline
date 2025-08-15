@@ -7,9 +7,9 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from article.models import NewsArticle
-from .models import School, Membership, Grade, Classroom
+from .models import School, Membership, Grade, Classroom, WeeklySchedule
 from .serializers import SchoolSerializer, MembershipSerializer, NewsSerializer,\
-      GradeSerializer, ClassroomSerializer
+      GradeSerializer, ClassroomSerializer, WeeklyScheduleSerializer
 from .filters import SchoolFilter
 from .permissions import IsSchoolNewsEditor, HasSchoolPermission
 
@@ -48,7 +48,24 @@ class GradeViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["name", "description"]
     ordering_fields = ["name"]
-    ordering = ["name"]  
+    ordering = ["name"] 
+
+
+    def get_queryset(self):
+        school_slug = self.kwargs.get('school_slug')
+        school = School.objects.get(slug=school_slug)
+
+        return self.queryset.filter(school=school)
+    
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        school = None
+        if "school_slug" in self.kwargs:
+            school = get_object_or_404(School, slug=self.kwargs["school_slug"])
+        context["school"] = school
+        return context 
+
 
 
 class ClassroomViewSet(viewsets.ModelViewSet):
@@ -60,7 +77,45 @@ class ClassroomViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["name"]
     ordering_fields = ["name"]
-    ordering = ["name"]  
+    ordering = ["name"] 
+
+    def get_queryset(self):
+        grade_pk = self.kwargs.get('grade_pk')
+        grade = Grade.objects.get(pk=grade_pk)
+
+        return self.queryset.filter(grade=grade)
+        
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        grade = None
+        if "garde_pk" in self.kwargs:
+            grade = get_object_or_404(Grade, id=self.kwargs["garde_pk"])
+        context["grade"] = grade
+        return context 
+
+class WeeklyScheduleViewSet(viewsets.ModelViewSet):
+    queryset = WeeklySchedule.objects.all()
+    serializer_class = WeeklyScheduleSerializer
+    permission_classes = [HasSchoolPermission]
+    permission_level = 7
+    permission_safe_methodes = True
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["subject", "day_of_week"]
+    ordering = ["day_of_week", "start_time"] 
+
+    def get_queryset(self):
+        classroom_pk = self.kwargs.get('classroom_pk')
+        classroom = Classroom.objects.get(pk=classroom_pk)
+
+        return self.queryset.filter(classroom=classroom).order_by('day_of_week', 'start_time')
+        
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        classroom = None
+        if "classroom_pk" in self.kwargs:
+            classroom = get_object_or_404(Classroom, id=self.kwargs["classroom_pk"])
+        context["classroom"] = classroom
+        return context
 
 
 # Dependent Views
