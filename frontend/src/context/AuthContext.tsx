@@ -33,6 +33,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (!value) {
           setUser(null);
         }
+      } else if (name === "accessToken") {
+        if (!value) {
+        }
       }
     };
 
@@ -43,32 +46,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   const handleTokenChange: CookieChangeListener = ({ name, value }) => {
-  //     if (name === "accessToken") {
-  //       if (value) {
-  //         try {
-  //           const userObject = jwtDecode<any>(value);
-  //           console.log("Decoded user object:", userObject);
-  //           if (userObject) {
-  //             setUser(userObject);
-  //           }
-  //         } catch (e) {
-  //           setUser(null);
-  //           cookies.remove("accessToken");
-  //         }
-  //       } else {
-  //         setUser(null);
-  //       }
-  //     }
-  //   };
-
-  //   cookies.addChangeListener(handleTokenChange);
-
-  //   return () => {
-  //     cookies.removeChangeListener(handleTokenChange);
-  //   };
-  // }, []);
   const setCookies = (data: any) => {
     const accessDecoderExp = jwtDecode<JwtPayload>(data.tokens.access).exp || 0;
     const refreshDecoderExp =
@@ -78,7 +55,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       path: "/",
       expires: new Date(accessDecoderExp * 1000),
     });
-    console.log();
     cookies.set("refreshToken", data.tokens.refresh, {
       path: "/",
       expires: new Date(refreshDecoderExp * 1000),
@@ -96,6 +72,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       credentials
     );
     setCookies(data);
+  };
+
+  const refresh = async (credentials: Credential) => {
+    try {
+      const { data } = await instance.post(
+        apiEndpoint.auth.refresh,
+        credentials
+      );
+      const accessDecoderExp =
+        jwtDecode<JwtPayload>(data.access).exp || 0;
+      const refreshDecoderExp =
+        jwtDecode<JwtPayload>(data.refresh).exp || 0;
+      cookies.set("accessToken", data.access, {
+        path: "/",
+        expires: new Date(accessDecoderExp * 1000),
+      });
+      cookies.set("refreshToken", data.refresh, {
+        path: "/",
+        expires: new Date(refreshDecoderExp * 1000),
+      });
+    } catch (e) {
+      logout();
+    }
   };
 
   const logout = () => {

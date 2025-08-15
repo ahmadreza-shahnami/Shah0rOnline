@@ -4,6 +4,7 @@ import HamburgerBar from "../components/HamburgerBar";
 import Footer from "../components/Footer";
 import clsx from "clsx";
 import { useParams } from "react-router";
+import { MembershipProvider } from "../context/MemberShipContext";
 
 const SchoolLayout = ({
   children,
@@ -47,16 +48,18 @@ const SchoolLayout = ({
           className="md:hidden block"
         />
       )}
-      <main
-        className={clsx(
-          "md:mt-[50px] max-w-6xl not-md:max-w-screen mx-auto bg-slate-50 px-12 py-4 md:min-h-[calc(100vh-50px)] not-md:min-h-screen"
-        )}
-      >
-        {title && (
-          <h1 className="font-bold text-3xl pt-10 pb-5 mb-16">{title}</h1>
-        )}
-        {children}
-      </main>
+      <MembershipProvider>
+        <main
+          className={clsx(
+            "md:mt-[50px] max-w-6xl not-md:max-w-screen mx-auto bg-slate-50 px-12 py-4 md:min-h-[calc(100vh-50px)] not-md:min-h-screen"
+          )}
+        >
+          {title && (
+            <h1 className="font-bold text-3xl pt-10 pb-5 mb-16">{title}</h1>
+          )}
+          {children}
+        </main>
+      </MembershipProvider>
       {hasFooter && <Footer />}
     </div>
   );

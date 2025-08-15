@@ -45,6 +45,7 @@ function App() {
       <Route path="/schools/:slug/news/:newsslug" element={<NewsDetail />} />
       {/* Error Pages */}
       <Route path="/unauthorized" element={<UnAuthorized />} />
+      <Route path="/schools/:slug/*" element={<NotFound />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
