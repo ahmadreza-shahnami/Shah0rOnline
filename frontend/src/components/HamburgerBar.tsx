@@ -46,7 +46,7 @@ export default function HamburgerMenu({
   }, [open]);
 
   return (
-    <nav className={clsx("relative isolate z-[100]", className)}>
+    <nav className={clsx("relative isolate z-[1010]", className)}>
       {/* Hamburger Button */}
       <HamburgerButton open={open} setOpen={setOpen} styles={styles} />
 

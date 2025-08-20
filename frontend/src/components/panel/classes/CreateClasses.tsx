@@ -4,6 +4,8 @@ import instance from "../../../utils/axios";
 import { Form, Formik } from "formik";
 import FormInput from "../../FormInput";
 import FormSelect from "../../FormSelect";
+import Button from "../../Button";
+import * as Yup from "yup";
 
 type Options = { label: string; value: string };
 type Grade = { id: number; name: string };
@@ -11,14 +13,9 @@ type Teacher = { id: number; user: string };
 
 export default function CreateClass() {
   const { slug } = useParams();
-  const [name, setName] = useState("");
-  const [gradeId, setGradeId] = useState<number | "">("");
-  const [teacherMembershipId, setTeacherMembershipId] = useState<number | "">(
-    ""
-  );
+
   const [grades, setGrades] = useState<Options[]>([]);
   const [teachers, setTeachers] = useState<Options[]>([]);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -46,43 +43,52 @@ export default function CreateClass() {
     load();
   }, [slug]);
 
-  const submit = async () => {
-    if (!name.trim() || !gradeId) return;
-    setLoading(true);
-    try {
-      await instance.post(`/school/schools/${slug}/classes/`, {
-        name,
-        grade: gradeId,
-        teacher_membership: teacherMembershipId || null,
-      });
-      setName("");
-      setGradeId("");
-      setTeacherMembershipId("");
-      alert("کلاس ساخته شد.");
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    // <div dir="rtl" className="space-y-4">
     <Formik
-      initialValues={{ name: "", teacher: "" }}
-      onSubmit={() => {}}
-      className="space-y-4"
+      initialValues={{ name: "", teacher: "", grade: "" }}
+      validationSchema={Yup.object({
+        name: Yup.string().required("نام کلاس الزامی است."),
+        grade: Yup.string()
+          .required("پایه الزامی است.")
+          .test((value) => {
+            if (value && !isNaN(Number(value)) && Number(value) > 0)
+              return true;
+            return false;
+          }),
+        teacher: Yup.string().test((value) => {
+          if (value && !isNaN(Number(value)) && Number(value) > 0) return true;
+          return false;
+        }),
+      })}
+      onSubmit={async (values, { setSubmitting, resetForm, setErrors }) => {
+        try {
+          await instance.post(
+            `/school/schools/${slug}/grades/${values.grade}/classrooms/`,
+            values
+          );
+          alert("کلاس ساخته شد.");
+          resetForm();
+        } catch (e: Error | any) {
+          console.error(e);
+          setErrors(e);
+        } finally {
+          setSubmitting(false);
+        }
+      }}
     >
-      <Form className="grid gap-3 max-w-xl space-y-4">
+      <Form className="space-y-4">
         <h2 className="text-xl font-bold">ساخت کلاس</h2>
-        <FormInput
-          label="نام کلاس"
-          name="name"
-          required
-          placeholder="مثل: 1/1"
-        />
-        <FormSelect label="پایه" name="grade" required options={grades} />
-        <FormSelect label="معلم" name="teacher" options={teachers} />
+        <div className="grid grid-cols-2 gap-6 not-md:grid-cols-1 px-5">
+          <FormInput
+            label="نام کلاس"
+            name="name"
+            required
+            placeholder="مثل: 1/1"
+          />
+          <FormSelect label="پایه" name="grade" required options={grades} />
+          <FormSelect label="معلم" name="teacher" options={teachers} />
+        </div>
+        <Button text="ثبت کلاس" style="submit" type="submit" />
       </Form>
     </Formik>
   );

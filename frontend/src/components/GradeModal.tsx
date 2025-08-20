@@ -100,7 +100,7 @@ export default function GradeModal({
                   key={cls.id}
                   className="p-3 bg-blue-100 rounded-lg hover:bg-blue-200 cursor-pointer"
                   onClick={() => {
-                    navigate(`classroom/${cls.id}/`);
+                    navigate(`grades/${selectedGrade.id}/classrooms/${cls.id}/`);
                   }}
                 >
                   {cls.name}

@@ -45,7 +45,7 @@ const NavBar = ({
     <nav
       className={clsx(
         t.bg,
-        "flex justify-around items-center w-full p-4",
+        "flex justify-around items-center w-full p-4 z-[1010]",
         className
       )}
     >

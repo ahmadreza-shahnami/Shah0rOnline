@@ -13,6 +13,7 @@ import SchoolDashboard from "./pages/SchoolDashboard";
 import NewsList from "./pages/NewsList";
 import NewsDetail from "./pages/NewsDetail";
 import Panel from "./pages/Panel";
+import Classroom from "./pages/Classroom";
 
 function App() {
   return (
@@ -43,6 +44,14 @@ function App() {
         element={
           <ProtectedRoute>
             <Panel />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/schools/:slug/grades/:gradeid/classrooms/:classroomid/"
+        element={
+          <ProtectedRoute>
+            <Classroom />
           </ProtectedRoute>
         }
       />

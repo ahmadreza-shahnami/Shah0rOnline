@@ -122,7 +122,6 @@ class Membership(models.Model):
 class Grade(models.Model):
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name="grades")
     name = models.CharField(max_length=50)
-    description = models.TextField(blank=True)
 
     def __str__(self):
         return f"{self.school.name} - {self.name}"

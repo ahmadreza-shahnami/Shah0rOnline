@@ -34,12 +34,13 @@ const FormSelect = ({ name, label, required, options }: FormSelectProps) => {
           <Select.Root
             value={field.value}
             onValueChange={(value) => form.setFieldValue(name, value)}
+            dir="rtl"
           >
             <Select.Trigger
               id={name}
-              className="inline-flex items-center justify-between w-full border border-black/25 rounded-lg py-1 px-4 text-sm focus:outline-none"
+              className="inline-flex items-center justify-between border border-black/25 rounded-lg py-2 px-4 text-sm focus:outline-none w-full"
             >
-              <Select.Value placeholder="Select an option" />
+              <Select.Value placeholder="انتخاب کنید" />
               <Select.Icon>
                 <ChevronDownIcon fontSize={16} />
               </Select.Icon>
@@ -47,8 +48,9 @@ const FormSelect = ({ name, label, required, options }: FormSelectProps) => {
 
             <Select.Portal>
               <Select.Content
-                className="z-50 overflow-hidden bg-white rounded-lg shadow-md"
+                className="z-50 overflow-hidden bg-white rounded-lg shadow-md min-w-[var(--radix-select-trigger-width)] max-w-[var(--radix-select-trigger-width)]"
                 position="popper"
+                sideOffset={4}
               >
                 <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white cursor-default">
                   <ChevronUpIcon fontSize={16} />
@@ -59,9 +61,11 @@ const FormSelect = ({ name, label, required, options }: FormSelectProps) => {
                     <Select.Item
                       key={opt.value}
                       value={opt.value}
-                      className="relative flex items-center px-6 py-2 rounded-md text-sm hover:bg-gray-100 cursor-pointer"
+                      className="relative flex items-center px-6 py-2 justify-center rounded-md text-sm hover:bg-gray-100 cursor-pointer"
                     >
-                      <Select.ItemText>{opt.label}</Select.ItemText>
+                      <Select.ItemText className="text-center">
+                        {opt.label}
+                      </Select.ItemText>
                       <Select.ItemIndicator className="absolute left-1 inline-flex items-center">
                         <CheckIcon fontSize={14} />
                       </Select.ItemIndicator>

@@ -100,7 +100,6 @@ class GradeSerializer(serializers.ModelSerializer):
             "id",
             "school",
             "name",
-            "description"
         ]
 
     def create(self, validated_data):
@@ -113,6 +112,17 @@ class GradeSerializer(serializers.ModelSerializer):
         if school:
             validated_data['school'] = school
         return super().update(instance, validated_data)
+
+
+class GradeClassroomSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Classroom
+        fields = [
+            "id",
+            "grade",
+            "name",
+        ]
 
 
 class ClassroomSerializer(serializers.ModelSerializer):
@@ -147,20 +157,21 @@ class ClassroomSerializer(serializers.ModelSerializer):
 
 class WeeklyScheduleSerializer(serializers.ModelSerializer):
     classroom = serializers.StringRelatedField()
-    day_of_week_display = serializers.CharField(source="get_type_display", read_only=True)
+    day_of_week_display = serializers.CharField(source="get_day_of_week_display", read_only=True)
     
     class Meta:
         model = WeeklySchedule
         fields = [
             "id",
             "classroom",
-            "day_of_week_display",
             "subject",
             "start_time",
             "end_time",
-        ]
-        extra_kwargs ={
-            'day_of_week': {'write_only': True},
+            "day_of_week",
+            "day_of_week_display",
+            ]
+        extra_kwargs = {
+            "day_of_week": {"write_only": True}
         }
 
     def create(self, validated_data):

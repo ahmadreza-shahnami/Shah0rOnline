@@ -7,15 +7,31 @@ from rest_framework.exceptions import NotFound
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import MultiPartParser, FormParser
 from article.models import NewsArticle
 from .models import School, Membership, Grade, Classroom, WeeklySchedule, VirtualTour
 from .serializers import SchoolSerializer, MembershipSerializer, NewsSerializer,\
       GradeSerializer, ClassroomSerializer, WeeklyScheduleSerializer,\
-      VirtualTourSerializer
+      VirtualTourSerializer, GradeClassroomSerializer
 from .filters import SchoolFilter
 from .permissions import IsSchoolNewsEditor, HasSchoolPermission, MembershipPermission
 
 class CustomViewSet(viewsets.ModelViewSet):
+    # Defaults for all child viewsets
+    permission_level = 0
+    permission_safe_methods = True
+    permission_code = []
+
+    def get_permission_level(self):
+        return getattr(self, "permission_level", 0)
+
+    def get_permission_safe_methods(self):
+        return getattr(self, "permission_safe_methods", True)
+    
+    def get_permission_codes(self):
+        return getattr(self, "permission_codes", [])
+    
+class CustomAPIView(views.APIView):
     # Defaults for all child viewsets
     permission_level = 0
     permission_safe_methods = True
@@ -116,9 +132,9 @@ class GradeViewSet(CustomViewSet):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
     permission_classes = [HasSchoolPermission]
-    permission_level = 5
+    permission_level = 8
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    search_fields = ["name", "description"]
+    search_fields = ["name"]
     ordering_fields = ["name"]
     ordering = ["name"] 
 
@@ -137,6 +153,14 @@ class GradeViewSet(CustomViewSet):
             school = get_object_or_404(School, slug=self.kwargs["school_slug"])
         context["school"] = school
         return context 
+    
+    @action(detail=False, methods=["get"])
+    def all_classrooms(self, request, school_slug):
+        school = get_object_or_404(School, slug=school_slug)
+        grades = self.get_queryset().filter(school=school)
+        classrooms = Classroom.objects.filter(grade__in=grades)
+        serializer = GradeClassroomSerializer(classrooms, many=True)
+        return Response(serializer.data)
 
 
 
@@ -164,12 +188,11 @@ class ClassroomViewSet(CustomViewSet):
         return context
 
 
-class WeeklyScheduleViewSet(viewsets.ModelViewSet):
+class WeeklyScheduleViewSet(CustomViewSet):
     queryset = WeeklySchedule.objects.all()
     serializer_class = WeeklyScheduleSerializer
     permission_classes = [HasSchoolPermission]
-    permission_level = 7
-    permission_safe_methodes = True
+    permission_level = 8
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["subject", "day_of_week"]
     ordering = ["day_of_week", "start_time"] 
@@ -189,10 +212,12 @@ class WeeklyScheduleViewSet(viewsets.ModelViewSet):
         return context
 
 
-class VirtualTourAPIView(views.APIView):
+class VirtualTourAPIView(CustomAPIView):
     permission_classes = [HasSchoolPermission]
     permission_level = 10
-    permission_safe_methodes = True
+    permission_safe_methods = True
+    parser_classes = [MultiPartParser, FormParser]
+
 
     def get_object(self, school_slug):
         try:
@@ -208,13 +233,12 @@ class VirtualTourAPIView(views.APIView):
     def post(self, request, school_slug):
         school = get_object_or_404(School, slug=school_slug)
 
-        zip_file = request.FILES.get('zip_file')
+        zip_file = request.data.get('zip_file')
         title = request.data.get('title')
 
         if not zip_file:
             return Response({"error": "zip_file is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # ذخیره مدل
         virtual_tour, created = VirtualTour.objects.get_or_create(
             school=school,
             defaults={'title': title, 'zip_file': zip_file}

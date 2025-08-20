@@ -3,7 +3,7 @@ import { ErrorMessage, Field } from "formik";
 export interface Input {
   name: string;
   label: string;
-  type?: "text" | "password" | "email" | "tel";
+  type?: "text" | "password" | "email" | "tel" | "file";
   required?: boolean;
   [key: string]: any;
 }

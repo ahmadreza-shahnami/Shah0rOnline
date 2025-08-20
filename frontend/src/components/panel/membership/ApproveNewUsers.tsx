@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import instance from "../../../utils/axios";
+import Button from "../../Button";
 
 type PendingMember = {
   id: number;
@@ -55,12 +56,15 @@ export default function ApproveNewUsers() {
   };
 
   return (
-    <div dir="rtl" className="space-y-4">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">تأیید کاربران جدید</h2>
-        <button onClick={load} className="px-3 py-2 rounded-lg bg-gray-200">
-          {loading ? "…" : "بروزرسانی"}
-        </button>
+        <Button
+          text={loading ? "…" : "بروزرسانی"}
+          type="button"
+          style="normal"
+          onClick={load}
+        />
       </div>
 
       <div className="border rounded-xl overflow-hidden">
