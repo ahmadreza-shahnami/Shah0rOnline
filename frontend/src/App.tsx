@@ -12,6 +12,7 @@ import SchoolsList from "./pages/SchoolsList";
 import SchoolDashboard from "./pages/SchoolDashboard";
 import NewsList from "./pages/NewsList";
 import NewsDetail from "./pages/NewsDetail";
+import Panel from "./pages/Panel";
 
 function App() {
   return (
@@ -34,6 +35,14 @@ function App() {
         element={
           <ProtectedRoute>
             <SchoolDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/schools/:slug/panel"
+        element={
+          <ProtectedRoute>
+            <Panel />
           </ProtectedRoute>
         }
       />

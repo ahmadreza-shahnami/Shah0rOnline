@@ -108,7 +108,10 @@ class Membership(models.Model):
             raise ValidationError (
                 f"Role '{self.role.name}' can't be assigned to a classroom."
             )
-        return super().clean()
+    
+    def save(self, *args, **kwargs):
+        self.full_clean() 
+        super().save(*args, **kwargs)
 
     def __str__(self):
         role_name = self.role.name if self.role else "No Role"

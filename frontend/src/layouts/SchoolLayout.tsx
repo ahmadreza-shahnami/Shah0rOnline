@@ -34,7 +34,7 @@ const SchoolLayout = ({
         <NavBar
           items={navItem}
           userMenuItems={[
-            { to: "/profile", label: "پروفایل" },
+            { to: `${basePath}/panel`, label: "پروفایل" },
             { to: "/logout", label: "خروج" },
           ]}
           className={`not-md:hidden block fixed top-0 left-0 right-0 mx-auto h-[50px] max-w-6xl `}

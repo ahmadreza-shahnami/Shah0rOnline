@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer, ValidationError, CharField
-from .models import CustomUser
+from .models import CustomUser, Role, Scope
 
 
 class UserSerializer(ModelSerializer):
@@ -25,4 +25,9 @@ class UserSerializer(ModelSerializer):
     
     def create(self, validated_data):
         validated_data.pop('confirm_password')
+        if not validated_data["role"]: 
+            scope = Scope.objects.get_or_create(name="global")
+            validated_data["role"] = Role.objects.get_or_create(name='base',defaults={
+                scope:scope,
+                })
         return CustomUser.objects.create_user(**validated_data)

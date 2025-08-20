@@ -6,9 +6,13 @@ const LogOut = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   React.useEffect(() => {
-    logout();
+    try {
+      logout();
+    } catch (e) {
+      console.log(e);
+    }
     navigate("/");
-  }, [logout, navigate]);
+  }, [navigate]);
   return null;
 };
 

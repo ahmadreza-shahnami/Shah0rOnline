@@ -2,7 +2,7 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
 from article.models import NewsArticle, Category
 from article.serializers import CategorySerializer
-from .models import School, Membership, Grade, Classroom, WeeklySchedule, VirtualTour
+from .models import School, Membership, Grade, Classroom, WeeklySchedule, VirtualTour, Role
 
 
 class SchoolSerializer(serializers.ModelSerializer):
@@ -25,9 +25,24 @@ class SchoolSerializer(serializers.ModelSerializer):
 
 
 class MembershipSerializer(serializers.ModelSerializer):
-    role = serializers.StringRelatedField()
-    user = serializers.StringRelatedField()
-    school = serializers.StringRelatedField()
+    ROLE_CHOICES = [
+        ("student", "Student"),
+        ("teacher", "Teacher"),
+        ("hoosen", "Hoosen"),
+    ]
+
+    # For input only
+    role_choice = serializers.ChoiceField(
+        choices=ROLE_CHOICES,
+        write_only=True
+    )
+
+    # Read-only fields
+    user = serializers.StringRelatedField(read_only=True)
+    school = serializers.StringRelatedField(read_only=True)
+    role = serializers.StringRelatedField(read_only=True)
+    classroom = serializers.StringRelatedField(read_only=True)
+    is_approved = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Membership
@@ -36,9 +51,44 @@ class MembershipSerializer(serializers.ModelSerializer):
             "user",
             "school",
             "role",
+            "role_choice",   # only appears in requests, not responses
             "classroom",
             "is_approved"
         ]
+
+    def validate(self, attrs):
+        role_choice = attrs.get("role_choice")
+        classroom = attrs.get("classroom")
+
+        if role_choice != "student" and classroom is not None:
+            raise serializers.ValidationError(
+                f"Role '{role_choice}' can't be assigned to a classroom."
+            )
+        return attrs
+
+    def create(self, validated_data):
+        user = self.context.get("user")
+        school = self.context.get("school")
+        role_choice = validated_data.pop("role_choice")
+
+        if user is None:
+            raise serializers.ValidationError("User must be provided via context.")
+        if school is None:
+            raise serializers.ValidationError("School must be provided via context.")
+
+        try:
+            role = Role.objects.get(name=role_choice)
+        except Role.DoesNotExist:
+            raise serializers.ValidationError({"role_choice": f"Invalid role: {role_choice}"})
+
+        membership = Membership.objects.create(
+            user=user,
+            school=school,
+            role=role,
+            **validated_data
+        )
+        return membership
+
 
 
 class GradeSerializer(serializers.ModelSerializer):
@@ -67,17 +117,23 @@ class GradeSerializer(serializers.ModelSerializer):
 
 class ClassroomSerializer(serializers.ModelSerializer):
     grade = serializers.StringRelatedField()
-    teacher = MembershipSerializer()
-    
+    teacher_name = serializers.SerializerMethodField()
+
     class Meta:
         model = Classroom
         fields = [
             "id",
             "grade",
             "name",
-            "teacher"
+            "teacher",
+            "teacher_name"
         ]
-
+        extra_kwargs = {
+            "teacher": {"write_only":True}
+        }
+    def get_teacher_name(self, obj):
+        return f"{obj.teacher.user.first_name} {obj.teacher.user.last_name}"
+    
     def create(self, validated_data):
         grade = self.context.get("grade")
         validated_data['grade'] = grade

@@ -22,12 +22,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setUser(value);
           } catch (e) {
             setUser(null);
-            cookies.remove("user");
-            cookies.remove("accessToken");
-            cookies.remove("refreshToken");
+            logout();
           }
         } else {
           setUser(null);
+          logout();
         }
       } else if (name === "refreshToken") {
         if (!value) {
@@ -35,6 +34,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } else if (name === "accessToken") {
         if (!value) {
+          const refreshToken = cookies.get("refreshToken");
+          if (refreshToken) {
+            refresh({ refreshToken: refreshToken });
+          }
         }
       }
     };
@@ -74,16 +77,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setCookies(data);
   };
 
-  const refresh = async (credentials: Credential) => {
+  const refresh = async (credentials: object) => {
     try {
       const { data } = await instance.post(
         apiEndpoint.auth.refresh,
         credentials
       );
-      const accessDecoderExp =
-        jwtDecode<JwtPayload>(data.access).exp || 0;
-      const refreshDecoderExp =
-        jwtDecode<JwtPayload>(data.refresh).exp || 0;
+      const accessDecoderExp = jwtDecode<JwtPayload>(data.access).exp || 0;
+      const refreshDecoderExp = jwtDecode<JwtPayload>(data.refresh).exp || 0;
       cookies.set("accessToken", data.access, {
         path: "/",
         expires: new Date(accessDecoderExp * 1000),

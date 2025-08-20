@@ -26,8 +26,9 @@ export const MembershipProvider = ({
     const fetchMembership = async () => {
       try {
         const responce = await instance.get(
-          `/school/schools/${param.slug}/membership/`
+          `/school/schools/${param.slug}/memberships/me`
         );
+        console.log(responce.data);
         setMembership(responce.data);
         setIsMember(!!responce.data.role);
       } catch (e) {

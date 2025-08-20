@@ -14,7 +14,7 @@ const RegisterForm = () => {
     confirm_password: "",
     first_name: "",
     last_name: "",
-    sex: "male",
+    gender: "M",
     phone: "",
     national_code: "",
     email: "",
@@ -60,6 +60,7 @@ const RegisterForm = () => {
       ),
     address: Yup.string(),
     email: Yup.string().email(),
+    gender: Yup.string().required(),
   });
 
   return (
@@ -71,7 +72,8 @@ const RegisterForm = () => {
           await register(values);
           navigate(searchParams.get("next") || "/");
         } catch (err) {
-          setErrors({ password: "Invalid credentials" });
+          console.log(err);
+          setErrors(err);
         } finally {
           setSubmitting(false);
         }
@@ -115,6 +117,17 @@ const RegisterForm = () => {
           label: "نام خانوادگی",
           required: true,
           autoComplete: "family-name",
+        },
+        {
+          name: "national_code",
+          label: "کدملی",
+          required: true,
+        },
+        {
+          name: "email",
+          label: "ایمیل",
+          required: true,
+          autoComplete: "email",
         },
       ]}
       submitButton={
