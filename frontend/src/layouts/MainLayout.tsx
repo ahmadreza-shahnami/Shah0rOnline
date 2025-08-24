@@ -40,7 +40,7 @@ const MainLayout = ({
         )}
       >
         {title && (
-          <h1 className="font-bold text-3xl pt-10 pb-5 mb-16">{title}</h1>
+          <h1 className="font-bold text-3xl pt-10 pb-5 mb-8">{title}</h1>
         )}
         {children}
       </main>

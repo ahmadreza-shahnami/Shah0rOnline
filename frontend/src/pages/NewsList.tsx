@@ -3,6 +3,7 @@ import instance from "../utils/axios";
 import { Link, useParams } from "react-router";
 import SchoolLayout from "../layouts/SchoolLayout";
 import CreateNewsModal from "../components/CreateNewsModal";
+import MemberAccess from "../components/MemberAccess";
 
 interface News {
   id: number;
@@ -38,8 +39,10 @@ export default function NewsList() {
 
   return (
     <SchoolLayout title="اخبار مدرسه">
-        <CreateNewsModal onCreated={() => window.location.reload()} />
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <MemberAccess roles={["principal"]}>
+          <CreateNewsModal onCreated={() => window.location.reload()} />
+        </MemberAccess>
         {newsList.map((item) => (
           <Link
             key={item.id}

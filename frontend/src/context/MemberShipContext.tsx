@@ -4,12 +4,15 @@ import instance from "../utils/axios";
 import { useAuth } from "./AuthContext";
 import { useParams } from "react-router";
 
-interface Membership {
+export interface Membership {
   role?: string;
   is_approved?: boolean;
   classrooms?: any;
 }
-const MembershipContext = createContext<any>(null);
+const MembershipContext = createContext<{
+  membership: Membership | null;
+  isMember: boolean;
+} | null>(null);
 
 export const MembershipProvider = ({
   children,

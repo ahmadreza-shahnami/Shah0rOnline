@@ -49,14 +49,14 @@ export default function CreateNewsModal({
         {children ? (
           children
         ) : (
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg">
+          <button className="bg-green-600 text-white px-4 py-2 rounded-lg cursor-pointer">
             ➕ ایجاد خبر جدید
           </button>
         )}
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/40" />
-        <Dialog.Content className="fixed top-[50%] left-[50%] w-[500px] bg-white rounded-lg p-5 shadow-lg -translate-x-1/2 -translate-y-1/2">
+        <Dialog.Overlay className="fixed inset-0 bg-black/40 z-[1011]" />
+        <Dialog.Content className="fixed top-[50%] left-[50%] w-[500px] z-[1011] bg-white rounded-lg p-5 shadow-lg -translate-x-1/2 -translate-y-1/2">
           <Dialog.Title className="text-xl font-bold mb-4">
             ایجاد خبر جدید
           </Dialog.Title>
