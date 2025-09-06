@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>گزارش مالی ماهانه</title>
+    <style>
+        /* استفاده از فونت فارسی که xhtml2pdf پشتیبانی می‌کنه */
+        @font-face {
+            font-family: "DejaVu";
+            src: url("{{ font_path }}") format("truetype");
+        }
+
+        body {
+            font-family: "DejaVu", sans-serif;
+            direction: rtl;
+            text-align: right;
+        }
+
+        h1 { text-align: center; }
+        ul { list-style: none; padding: 0; }
+        li { margin-bottom: 5px; }
+        strong { font-size: 1.2em; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #000; padding: 5px; text-align: right; }
+        th { background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>گزارش مالی ماهانه - {{ school.name }}</h1>
+    <p>ماه: {{ month }} / سال: {{ year }}</p>
+    <ul>
+        <li>درآمد: {{ report.income }} تومان</li>
+        <li>حقوق پرسنل: {{ report.salary_total }} تومان</li>
+        <li>هزینه‌های ثابت: {{ report.expenses_total }} تومان</li>
+        <li>کل هزینه‌ها: {{ report.total_expenses }} تومان</li>
+        <li><strong>سود/زیان: {{ report.profit }} تومان</strong></li>
+    </ul>
+
+    {% if report.payments %}
+        <h2>پرداخت‌های دانش‌آموزان</h2>
+        <table>
+            <tr>
+                <th>دانش‌آموز</th>
+                <th>مبلغ</th>
+                <th>تاریخ</th>
+            </tr>
+            {% for p in report.payments %}
+            <tr>
+                <td>{{ p.student.user.get_full_name|default:p.student.user.username }}</td>
+                <td>{{ p.amount }}</td>
+                <td>{{ p.payment_date }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    {% if report.salaries %}
+        <h2>حقوق پرسنل</h2>
+        <table>
+            <tr>
+                <th>پرسنل</th>
+                <th>حقوق</th>
+            </tr>
+            {% for s in report.salaries %}
+            <tr>
+                <td>{{ s.staff.user.get_full_name|default:s.staff.user.username }}</td>
+                <td>{{ s.total_salary }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    {% if report.expenses %}
+        <h2>هزینه‌ها</h2>
+        <table>
+            <tr>
+                <th>عنوان</th>
+                <th>مبلغ</th>
+                <th>تاریخ</th>
+            </tr>
+            {% for e in report.expenses %}
+            <tr>
+                <td>{{ e.title }}</td>
+                <td>{{ e.amount }}</td>
+                <td>{{ e.expense_date }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</body>
+</html>

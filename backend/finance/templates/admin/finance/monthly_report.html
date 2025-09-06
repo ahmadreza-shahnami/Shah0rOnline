@@ -1,0 +1,95 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h1>گزارش مالی ماهانه</h1>
+
+<form method="get">
+  <label>مدرسه:</label>
+  <select name="school_id">
+    {% for s in schools %}
+      <option value="{{ s.id }}" {% if selected_school == s.id %}selected{% endif %}>{{ s.name }}</option>
+    {% endfor %}
+  </select>
+
+  <label>ماه:</label>
+  <input type="number" name="month" value="{{ month }}" min="1" max="12">
+
+  <label>سال:</label>
+  <input type="number" name="year" value="{{ year }}">
+
+  <button type="submit">نمایش</button>
+</form>
+
+{% if report %}
+  <h2>نتیجه:</h2>
+  <ul>
+    <li>درآمد: {{ report.income }} تومان</li>
+    <li>حقوق پرسنل: {{ report.salary_total }} تومان</li>
+    <li>هزینه‌های ثابت: {{ report.expenses_total }} تومان</li>
+    <li>کل هزینه‌ها: {{ report.total_expenses }} تومان</li>
+    <li><strong>سود/زیان: {{ report.profit }} تومان</strong></li>
+  </ul>
+
+  <hr>
+
+  <h3>پرداخت‌های دانش‌آموزان</h3>
+  <table border="1" cellspacing="0" cellpadding="5">
+    <tr>
+      <th>دانش‌آموز</th>
+      <th>مبلغ</th>
+      <th>تاریخ</th>
+    </tr>
+    {% for p in report.payments %}
+    <tr>
+      <td>{{ p.student.user.get_full_name|default:p.student.user.username }}</td>
+      <td>{{ p.amount }}</td>
+      <td>{{ p.payment_date }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3">هیچ پرداختی ثبت نشده</td></tr>
+    {% endfor %}
+  </table>
+
+  <h3>حقوق پرسنل</h3>
+  <table border="1" cellspacing="0" cellpadding="5">
+    <tr>
+      <th>پرسنل</th>
+      <th>حقوق</th>
+    </tr>
+    {% for s in report.salaries %}
+    <tr>
+      <td>{{ s.staff.user.get_full_name|default:s.staff.user.username }}</td>
+      <td>{{ s.total_salary }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="2">هیچ حقوقی ثبت نشده</td></tr>
+    {% endfor %}
+  </table>
+
+  <h3>هزینه‌ها</h3>
+  <table border="1" cellspacing="0" cellpadding="5">
+    <tr>
+      <th>عنوان</th>
+      <th>مبلغ</th>
+      <th>تاریخ</th>
+    </tr>
+    {% for e in report.expenses %}
+    <tr>
+      <td>{{ e.title }}</td>
+      <td>{{ e.amount }}</td>
+      <td>{{ e.expense_date }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3">هیچ هزینه‌ای ثبت نشده</td></tr>
+    {% endfor %}
+  </table>
+
+  <a href="{% url 'admin:monthly-report-pdf' %}?school_id={{ selected_school }}&month={{ month }}&year={{ year }}" target="_blank">
+    📄 دانلود PDF
+  </a>
+
+  <a href="{% url 'admin:download-monthly-report-csv' %}?school_id={{ selected_school }}&month={{ month }}&year={{ year }}">
+    📊 دانلود CSV
+  </a>
+
+{% endif %}
+{% endblock %}
